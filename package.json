@@ -1,0 +1,32 @@
+{
+  "name": "@dw/webpack-prompt-plugin",
+  "version": "1.0.4",
+  "description": "webpack提示插件",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "publish": "npm publish --access=public"
+  },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IFmiss/webpack-prompt-plugin.git"
+  },
+  "keywords": [
+    "webpack"
+  ],
+  "author": "ifmiss",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IFmiss/webpack-prompt-plugin/issues"
+  },
+  "homepage": "https://github.com/IFmiss/webpack-prompt-plugin#readme",
+  "dependencies": {
+    "@types/node": "^11.13.8"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "es6", 
+    "module": "CommonJS",
+    "removeComments": false,
+    "declaration": true,
+    "outDir": "./dist",
+    "declarationDir": "./dist",
+    "baseUrl": "./",
+    "rootDir": "src",
+    "experimentalDecorators": true,
+    "allowJs": false,
+    "lib": [
+      "dom",
+      "es2015"
+    ],
+    "sourceMap": true,
+    "noImplicitAny": false
+  },
+  "files": [
+    "src/index.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
