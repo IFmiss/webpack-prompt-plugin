@@ -1,6 +1,6 @@
 {
   "name": "@dw/webpack-prompt-plugin",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "webpack提示插件",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -26,7 +26,7 @@
     "url": "https://github.com/IFmiss/webpack-prompt-plugin/issues"
   },
   "homepage": "https://github.com/IFmiss/webpack-prompt-plugin#readme",
-  "dependencies": {
+  "devDependencies": {
     "@types/node": "^11.13.8"
   }
 }

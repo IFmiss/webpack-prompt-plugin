@@ -1,5 +1,6 @@
 const os = require('os');
 const chalk = require('chalk');
+const PLUGIN_NAME = 'webpack-prompt-plugin';
 class WebpackPromptPlugin {
     constructor(options) {
         this.option = {
@@ -36,17 +37,34 @@ class WebpackPromptPlugin {
         this.apply = function (compilation) {
             const self = this;
             let isWatch = false;
-            compilation.plugin('watchRun', function (compiler) {
-                isWatch = true;
-            });
-            compilation.plugin('done', function (stats) {
-                if (isWatch) {
-                    self.printIP(compilation['options']['devServer']);
-                }
-            });
-            compilation.plugin('failed', function () {
-                console.log(chalk.red('failed'));
-            });
+            if (compilation.hooks) {
+                compilation.hooks.watchRun.tap(PLUGIN_NAME, function () {
+                    isWatch = true;
+                });
+                compilation.hooks.done.tap(PLUGIN_NAME, function () {
+                    if (isWatch) {
+                        self.printIP(compilation['options']['devServer']);
+                    }
+                });
+                compilation.hooks.failed.tap(PLUGIN_NAME, function () {
+                    isWatch = false;
+                    console.log(chalk.red('failed'));
+                });
+            }
+            else {
+                compilation.plugin('watchRun', function (compiler) {
+                    isWatch = true;
+                });
+                compilation.plugin('done', function (stats) {
+                    if (isWatch) {
+                        self.printIP(compilation['options']['devServer']);
+                    }
+                });
+                compilation.plugin('failed', function () {
+                    isWatch = false;
+                    console.log(chalk.red('failed'));
+                });
+            }
         };
         this.option = Object.assign({}, this.option, options);
     }
