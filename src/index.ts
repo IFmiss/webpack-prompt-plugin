@@ -1,11 +1,29 @@
 const os = require('os')
 const chalk = require('chalk')
 const PLUGIN_NAME = 'webpack-prompt-plugin';
+
+interface Itip {
+  name: string
+  color?: string
+}
+
+interface Ioptions {
+  ip: boolean
+  tips: Itip[]
+}
+
 class WebpackPromptPlugin {
+  isWatch = false
   option = {
-    ip: true
+    ip: true,
+    tips: [
+      {
+        name: '你好',
+        color: ''
+      }
+    ]
   }
-  constructor (options) {
+  constructor (options: Ioptions) {
     this.option = Object.assign({}, this.option, options)
   }
 
@@ -39,37 +57,75 @@ class WebpackPromptPlugin {
     }
   }
 
-  apply = function (compilation: any) {
+  printIpHandler = function (compilation: any): void {
     const self = this
-    let isWatch = false
 
     if (compilation.hooks) {
-      compilation.hooks.watchRun.tap(PLUGIN_NAME, function() {
-        isWatch = true
-      })
       compilation.hooks.done.tap(PLUGIN_NAME, function() {
-        if (isWatch) {
-          self.printIP(compilation['options']['devServer'])
-        }
+        self.isWatch && compilation['options']['devServer'] && self.printIP(compilation['options']['devServer'])
+      })
+    } else {
+      compilation.plugin('done', function(stats: any) {
+        self.isWatch && compilation['options']['devServer'] && self.printIP(compilation['options']['devServer'])
+      })
+    }
+  }
+
+  printCustom = function (): void {
+    this.option.tips.length && this.option.tips.forEach((item: Itip | string) => {
+      if (typeof item === 'string') {
+        console.log(chalk.green(item || 'hello webpack-prompt-plugin'))
+      }
+
+      if (typeof item === 'object') {
+        console.log(chalk[item.color](item.name || 'hello webpack-prompt-plugin'))
+      }
+    })
+  }
+
+  printCustomHandler = function (compilation: any): void {
+    const self = this
+    if (compilation.hooks) {
+      compilation.hooks.done.tap(PLUGIN_NAME, function() {
+        self.printCustom()
+      })
+    } else {
+      compilation.plugin('done', function(stats: any) {
+        self.printCustom()
+      })
+    }
+  }
+
+  initHandler = function (compilation: any): void {
+    const self = this
+    if (compilation.hooks) {
+      compilation.hooks.watchRun.tap(PLUGIN_NAME, function() {
+        self.isWatch = true
       })
       compilation.hooks.failed.tap(PLUGIN_NAME, function() {
-        isWatch = false
+        self.isWatch = false
         console.log(chalk.red('failed'))
       })
     } else {
       compilation.plugin('watchRun', function(compiler: any) {
-        isWatch = true
+        self.isWatch = true
       })
       compilation.plugin('done', function(stats: any) {
-        if (isWatch) {
-          self.printIP(compilation['options']['devServer'])
-        }
+        self.isWatch && compilation['options']['devServer'] && self.printIP(compilation['options']['devServer'])
       })
       compilation.plugin('failed', function () {
-        isWatch = false
+        self.isWatch = false
         console.log(chalk.red('failed'))
       })
     }
+  }
+
+  apply = function (compilation: any) {
+    this.initHandler(compilation)
+
+    this.printIpHandler(compilation)
+
+    this.printCustomHandler(compilation)
   }
 }
 

@@ -3,8 +3,15 @@ const chalk = require('chalk');
 const PLUGIN_NAME = 'webpack-prompt-plugin';
 class WebpackPromptPlugin {
     constructor(options) {
+        this.isWatch = false;
         this.option = {
-            ip: true
+            ip: true,
+            tips: [
+                {
+                    name: '你好',
+                    color: ''
+                }
+            ]
         };
         this.getIP = function () {
             let localIPAddress = "";
@@ -34,37 +41,70 @@ class WebpackPromptPlugin {
                 console.log('\n');
             }
         };
-        this.apply = function (compilation) {
+        this.printIpHandler = function (compilation) {
             const self = this;
-            let isWatch = false;
+            if (compilation.hooks) {
+                compilation.hooks.done.tap(PLUGIN_NAME, function () {
+                    self.isWatch && compilation['options']['devServer'] && self.printIP(compilation['options']['devServer']);
+                });
+            }
+            else {
+                compilation.plugin('done', function (stats) {
+                    self.isWatch && compilation['options']['devServer'] && self.printIP(compilation['options']['devServer']);
+                });
+            }
+        };
+        this.printCustom = function () {
+            this.option.tips.length && this.option.tips.forEach((item) => {
+                if (typeof item === 'string') {
+                    console.log(chalk.green(item || 'hello webpack-prompt-plugin'));
+                }
+                if (typeof item === 'object') {
+                    console.log(chalk[item.color](item.name || 'hello webpack-prompt-plugin'));
+                }
+            });
+        };
+        this.printCustomHandler = function (compilation) {
+            const self = this;
+            if (compilation.hooks) {
+                compilation.hooks.done.tap(PLUGIN_NAME, function () {
+                    self.printCustom();
+                });
+            }
+            else {
+                compilation.plugin('done', function (stats) {
+                    self.printCustom();
+                });
+            }
+        };
+        this.initHandler = function (compilation) {
+            const self = this;
             if (compilation.hooks) {
                 compilation.hooks.watchRun.tap(PLUGIN_NAME, function () {
-                    isWatch = true;
-                });
-                compilation.hooks.done.tap(PLUGIN_NAME, function () {
-                    if (isWatch) {
-                        self.printIP(compilation['options']['devServer']);
-                    }
+                    self.isWatch = true;
                 });
                 compilation.hooks.failed.tap(PLUGIN_NAME, function () {
-                    isWatch = false;
+                    self.isWatch = false;
                     console.log(chalk.red('failed'));
                 });
             }
             else {
                 compilation.plugin('watchRun', function (compiler) {
-                    isWatch = true;
+                    self.isWatch = true;
                 });
                 compilation.plugin('done', function (stats) {
-                    if (isWatch) {
-                        self.printIP(compilation['options']['devServer']);
-                    }
+                    self.isWatch && compilation['options']['devServer'] && self.printIP(compilation['options']['devServer']);
                 });
                 compilation.plugin('failed', function () {
-                    isWatch = false;
+                    self.isWatch = false;
                     console.log(chalk.red('failed'));
                 });
             }
+        };
+        this.apply = function (compilation) {
+            this.initHandler(compilation);
+            this.printIpHandler(compilation);
+            this.printCustomHandler(compilation);
         };
         this.option = Object.assign({}, this.option, options);
     }
