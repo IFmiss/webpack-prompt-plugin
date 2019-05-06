@@ -1,5 +1,6 @@
 declare const os: any;
 declare const chalk: any;
+declare const fs: any;
 declare const PLUGIN_NAME = "webpack-prompt-plugin";
 interface Itip {
     name: string;
@@ -13,17 +14,15 @@ declare class WebpackPromptPlugin {
     isWatch: boolean;
     option: {
         ip: boolean;
-        tips: {
-            name: string;
-            color: string;
-        }[];
+        tips: any[];
     };
     constructor(options: Ioptions);
     getIP: () => string;
+    getPackageJson: () => any;
     printIP: (devServer: any) => void;
-    printIpHandler: (compilation: any) => void;
+    printProjectInfo: () => void;
+    printHandler: (compiler: any) => void;
     printCustom: () => void;
-    printCustomHandler: (compilation: any) => void;
-    initHandler: (compilation: any) => void;
-    apply: (compilation: any) => void;
+    initHandler: (compiler: any) => void;
+    apply: (compiler: any) => void;
 }
