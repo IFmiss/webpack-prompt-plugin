@@ -1,6 +1,6 @@
 {
-  "name": "@dw/webpack-prompt-plugin",
-  "version": "1.0.8",
+  "name": "webpack-prompt-plugin",
+  "version": "1.0.9",
   "description": "webpack提示插件",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

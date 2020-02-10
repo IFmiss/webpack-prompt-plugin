@@ -16,7 +16,10 @@ class WebpackPromptPlugin {
                 let iface = interfaces[devName];
                 for (let i = 0; i < iface.length; i++) {
                     let alias = iface[i];
-                    if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+                    if (alias.family === 'IPv4' &&
+                        alias.address !== '127.0.0.1' &&
+                        !alias.internal &&
+                        alias.mac !== '00:00:00:00:00:00') {
                         localIPAddress = alias.address;
                     }
                 }

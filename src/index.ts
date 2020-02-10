@@ -10,7 +10,7 @@ interface Itip {
 
 interface Ioptions {
   ip: boolean
-  tips: Itip[]
+  tips: Array<Itip>
 }
 
 class WebpackPromptPlugin {
@@ -27,13 +27,16 @@ class WebpackPromptPlugin {
     let localIPAddress = "";
     let interfaces = os.networkInterfaces();
     for (let devName in interfaces) {
-        let iface = interfaces[devName];
-        for (let i = 0; i < iface.length; i++) {
-            let alias = iface[i];
-            if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
-                localIPAddress = alias.address;
-            }
+      let iface = interfaces[devName];
+      for (let i = 0; i < iface.length; i++) {
+        let alias = iface[i];
+        if (alias.family === 'IPv4' &&
+          alias.address !== '127.0.0.1' &&
+          !alias.internal &&
+          alias.mac !== '00:00:00:00:00:00') {
+          localIPAddress = alias.address;
         }
+      }
     }
     return localIPAddress;
   }

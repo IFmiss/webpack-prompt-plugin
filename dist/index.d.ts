@@ -8,7 +8,7 @@ interface Itip {
 }
 interface Ioptions {
     ip: boolean;
-    tips: Itip[];
+    tips: Array<Itip>;
 }
 declare class WebpackPromptPlugin {
     isWatch: boolean;
