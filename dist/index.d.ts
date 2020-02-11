@@ -12,6 +12,7 @@ interface Ioptions {
 }
 declare class WebpackPromptPlugin {
     isWatch: boolean;
+    isStarted: boolean;
     option: {
         ip: boolean;
         tips: any[];

@@ -15,6 +15,7 @@ interface Ioptions {
 
 class WebpackPromptPlugin {
   isWatch = false
+  isStarted = false
   option = {
     ip: true,
     tips: []
@@ -72,12 +73,16 @@ class WebpackPromptPlugin {
 
     if (compiler.hooks) {
       compiler.hooks.done.tap(PLUGIN_NAME, function() {
+        if (self.isStarted) return
+        self.isStarted = true
         self.option.ip && self.isWatch && compiler['options']['devServer'] && self.printIP(compiler['options']['devServer'])
         self.printProjectInfo()
         self.printCustom()
       })
     } else {
       compiler.plugin('done', function(stats: any) {
+        if (self.isStarted) return
+        self.isStarted = true
         self.option.ip && self.isWatch && compiler['options']['devServer'] && self.printIP(compiler['options']['devServer'])
         self.printProjectInfo()
         self.printCustom()

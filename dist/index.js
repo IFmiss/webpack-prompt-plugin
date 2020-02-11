@@ -5,6 +5,7 @@ const PLUGIN_NAME = 'webpack-prompt-plugin';
 class WebpackPromptPlugin {
     constructor(options) {
         this.isWatch = false;
+        this.isStarted = false;
         this.option = {
             ip: true,
             tips: []
@@ -53,6 +54,9 @@ class WebpackPromptPlugin {
             const self = this;
             if (compiler.hooks) {
                 compiler.hooks.done.tap(PLUGIN_NAME, function () {
+                    if (self.isStarted)
+                        return;
+                    self.isStarted = true;
                     self.option.ip && self.isWatch && compiler['options']['devServer'] && self.printIP(compiler['options']['devServer']);
                     self.printProjectInfo();
                     self.printCustom();
@@ -60,6 +64,9 @@ class WebpackPromptPlugin {
             }
             else {
                 compiler.plugin('done', function (stats) {
+                    if (self.isStarted)
+                        return;
+                    self.isStarted = true;
                     self.option.ip && self.isWatch && compiler['options']['devServer'] && self.printIP(compiler['options']['devServer']);
                     self.printProjectInfo();
                     self.printCustom();
