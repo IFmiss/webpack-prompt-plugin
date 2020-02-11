@@ -36,7 +36,6 @@ class WebpackPromptPlugin {
                 const host = devServer.host ? (devServer.host === '0.0.0.0' ? this.getIP() : devServer.host) : 'localhost';
                 const port = devServer.port || 80;
                 const text = `http://${host}:${port}/`;
-                console.log(process.env.name);
                 console.log('\n');
                 console.log(chalk.bgGreen.black(' done '), chalk.green('App is runing!'));
                 console.log('\n');

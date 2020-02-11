@@ -3,11 +3,11 @@
 webpack提示插件
 
 ```code
-yarn add @dw/webpack-prompt-plugin
+yarn add webpack-prompt-plugin
 ```
 
 ```js
-const webpackPromptPlugin = require('@dw/webpack-prompt-plugin');
+const webpackPromptPlugin = require('webpack-prompt-plugin');
 
 module.exports = {
   // ...
