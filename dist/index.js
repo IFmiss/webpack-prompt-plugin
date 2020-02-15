@@ -1,9 +1,9 @@
-const os = require('os');
-const chalk = require('chalk');
-const fs = require('fs');
-const PLUGIN_NAME = 'webpack-prompt-plugin';
-class WebpackPromptPlugin {
-    constructor(options) {
+var os = require('os');
+var chalk = require('chalk');
+var fs = require('fs');
+var PLUGIN_NAME = 'webpack-prompt-plugin';
+var WebpackPromptPlugin = /** @class */ (function () {
+    function WebpackPromptPlugin(options) {
         this.isWatch = false;
         this.isStarted = false;
         this.option = {
@@ -11,12 +11,12 @@ class WebpackPromptPlugin {
             tips: []
         };
         this.getIP = function () {
-            let localIPAddress = "";
-            let interfaces = os.networkInterfaces();
-            for (let devName in interfaces) {
-                let iface = interfaces[devName];
-                for (let i = 0; i < iface.length; i++) {
-                    let alias = iface[i];
+            var localIPAddress = "";
+            var interfaces = os.networkInterfaces();
+            for (var devName in interfaces) {
+                var iface = interfaces[devName];
+                for (var i = 0; i < iface.length; i++) {
+                    var alias = iface[i];
                     if (alias.family === 'IPv4' &&
                         alias.address !== '127.0.0.1' &&
                         !alias.internal &&
@@ -28,30 +28,30 @@ class WebpackPromptPlugin {
             return localIPAddress;
         };
         this.getPackageJson = function () {
-            const _packageJson = fs.readFileSync('./package.json');
+            var _packageJson = fs.readFileSync('./package.json');
             return JSON.parse(_packageJson);
         };
         this.printIP = function (devServer) {
             // 打印返回信息
             if (this.option.ip) {
-                const host = devServer.host ? (devServer.host === '0.0.0.0' ? this.getIP() : devServer.host) : 'localhost';
-                const port = devServer.port || 80;
-                const text = `http://${host}:${port}/`;
+                var host = devServer.host ? (devServer.host === '0.0.0.0' ? this.getIP() : devServer.host) : 'localhost';
+                var port = devServer.port || 80;
+                var text = "http://" + host + ":" + port + "/";
                 console.log('\n');
                 console.log(chalk.bgGreen.black(' done '), chalk.green('App is runing!'));
                 console.log('\n');
-                console.log('- Local:  ', chalk.underline.blue(`http://localhost:${port}/`));
+                console.log('- Local:  ', chalk.underline.blue("http://localhost:" + port + "/"));
                 console.log('- Network:', chalk.underline.blue(text));
                 console.log('\n');
             }
         };
         this.printProjectInfo = function () {
-            const packageJson = this.getPackageJson();
+            var packageJson = this.getPackageJson();
             console.log('name: ', chalk.underline.green(packageJson.name), '   version: ', chalk.underline.green(packageJson.version));
             console.log('\n');
         };
         this.printHandler = function (compiler) {
-            const self = this;
+            var self = this;
             if (compiler.hooks) {
                 compiler.hooks.done.tap(PLUGIN_NAME, function () {
                     if (self.isStarted)
@@ -74,18 +74,18 @@ class WebpackPromptPlugin {
             }
         };
         this.printCustom = function () {
-            this.option.tips && this.option.tips.length && this.option.tips.forEach((item) => {
-                const color = item.color ? item.color : 'green';
+            this.option.tips && this.option.tips.length && this.option.tips.forEach(function (item) {
+                var color = item.color ? item.color : 'green';
                 if (typeof item === 'object') {
-                    console.log(chalk[color](item.name || `hello ${PLUGIN_NAME}`));
+                    console.log(chalk[color](item.name || "hello " + PLUGIN_NAME));
                 }
                 else {
-                    console.log(chalk.green(item || `hello ${PLUGIN_NAME}`));
+                    console.log(chalk.green(item || "hello " + PLUGIN_NAME));
                 }
             });
         };
         this.initHandler = function (compiler) {
-            const self = this;
+            var self = this;
             if (compiler.hooks) {
                 compiler.hooks.watchRun.tap(PLUGIN_NAME, function () {
                     self.isWatch = true;
@@ -111,6 +111,7 @@ class WebpackPromptPlugin {
         };
         this.option = Object.assign({}, this.option, options);
     }
-}
+    return WebpackPromptPlugin;
+}());
 module.exports = WebpackPromptPlugin;
 //# sourceMappingURL=index.js.map
