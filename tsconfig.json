@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5", 
-    "module": "CommonJS",
+    "module": "ESNext",
     "removeComments": false,
     "declaration": true,
     "outDir": "./dist",

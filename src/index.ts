@@ -1,16 +1,19 @@
-const os = require('os')
-const chalk = require('chalk')
-const fs = require('fs')
-const PLUGIN_NAME = 'webpack-prompt-plugin'
+import {
+  getPkg
+} from './utils';
 
+const chalk = require('chalk')
+const PLUGIN_NAME = 'webpack-prompt-plugin'
+const ip = require('ip');
+const packageJson = getPkg();
 interface Itip {
-  name: string
-  color?: string
+  name: string;
+  color?: string;
 }
 
 interface Ioptions {
-  ip: boolean
-  tips: Array<Itip>
+  ip: boolean;
+  tips: Array<Itip>;
 }
 
 class WebpackPromptPlugin {
@@ -24,27 +27,8 @@ class WebpackPromptPlugin {
     this.option = Object.assign({}, this.option, options)
   }
 
-  getIP = function(): string {
-    let localIPAddress = "";
-    let interfaces = os.networkInterfaces();
-    for (let devName in interfaces) {
-      let iface = interfaces[devName];
-      for (let i = 0; i < iface.length; i++) {
-        let alias = iface[i];
-        if (alias.family === 'IPv4' &&
-          alias.address !== '127.0.0.1' &&
-          !alias.internal &&
-          alias.mac !== '00:00:00:00:00:00') {
-          localIPAddress = alias.address;
-        }
-      }
-    }
-    return localIPAddress;
-  }
-
-  getPackageJson = function (): any {
-    const _packageJson = fs.readFileSync('./package.json')
-    return JSON.parse(_packageJson)
+  getIP = function(): string {                                                      
+    return ip.address();
   }
 
   printIP = function(devServer: any): void {
@@ -54,7 +38,7 @@ class WebpackPromptPlugin {
       const port = devServer.port || 80
       const text = `http://${host}:${port}/`
       console.log('\n')
-      console.log(chalk.bgGreen.black(' done '), chalk.green('App is runing!'))
+      console.log(chalk.bgGreen.black(' done '), chalk.green(`App is runing!`))
       console.log('\n')
       console.log('- Local:  ', chalk.underline.blue(`http://localhost:${port}/`))
       console.log('- Network:', chalk.underline.blue(text))
@@ -63,7 +47,6 @@ class WebpackPromptPlugin {
   }
 
   printProjectInfo = function (): void {
-    const packageJson = this.getPackageJson()
     console.log('name: ', chalk.underline.green(packageJson.name), '   version: ', chalk.underline.green(packageJson.version))
     console.log('\n')
   }
