@@ -1,7 +1,8 @@
 import {
   getPkg
 } from './utils';
-
+const detect = require('detect-port');
+const inquirer = require('inquirer');
 const chalk = require('chalk')
 const PLUGIN_NAME = 'webpack-prompt-plugin'
 const ip = require('ip');
@@ -14,6 +15,7 @@ interface Itip {
 interface Ioptions {
   ip: boolean;
   tips: Array<Itip>;
+  checkPort?: boolean;
 }
 
 class WebpackPromptPlugin {
@@ -21,17 +23,18 @@ class WebpackPromptPlugin {
   isStarted = false
   option = {
     ip: true,
-    tips: []
+    tips: [],
+    checkPort: true
   }
   constructor (options: Ioptions) {
     this.option = Object.assign({}, this.option, options)
   }
 
-  getIP = function(): string {                                                      
+  getIP(): string {
     return ip.address();
   }
 
-  printIP = function(devServer: any): void {
+  printIP(devServer: any): void {
     // 打印返回信息
     if (this.option.ip) {
       const host = devServer.host ? (devServer.host === '0.0.0.0' ? this.getIP() : devServer.host) : 'localhost'
@@ -46,14 +49,13 @@ class WebpackPromptPlugin {
     }
   }
 
-  printProjectInfo = function (): void {
+  printProjectInfo(): void {
     console.log('name: ', chalk.underline.green(packageJson.name), '   version: ', chalk.underline.green(packageJson.version))
     console.log('\n')
   }
 
-  printHandler = function (compiler: any): void {
+  printHandler(compiler: any): void {
     const self = this
-
     if (compiler.hooks) {
       compiler.hooks.done.tap(PLUGIN_NAME, function() {
         if (self.isStarted) return
@@ -73,7 +75,7 @@ class WebpackPromptPlugin {
     }
   }
 
-  printCustom = function (): void {
+  printCustom(): void {
     this.option.tips && this.option.tips.length && this.option.tips.forEach((item: Itip | string | any) => {
       const color = item.color ? item.color : 'green'
       if (typeof item === 'object') {
@@ -84,9 +86,13 @@ class WebpackPromptPlugin {
     })
   }
 
-  initHandler = function (compiler: any): void {
+  initHandler(compiler: any): void {
     const self = this
     if (compiler.hooks) {
+      compiler.hooks.afterPlugins.tap(PLUGIN_NAME, function(compiler) {
+        self.checkPort(compiler);
+        return;
+      });
       compiler.hooks.watchRun.tap(PLUGIN_NAME, function() {
         self.isWatch = true
       })
@@ -105,9 +111,38 @@ class WebpackPromptPlugin {
     }
   }
 
-  apply = function (compiler: any) {
-    this.initHandler(compiler)
+  checkPort(compiler) {
+    if (!this.option.checkPort) return;
+    // compiler.options.devServer.port = 2000;
+    const port = compiler.options.devServer.port || 80;
+    detect(port, (err, _port) => {
+      if (err) {
+        console.log(err);
+      }
+      if (port === _port) {
+        console.log(`port: ${port} was not occupied`);
+      } else {
+        inquirer.prompt([
+          {
+            name: 'changePort',
+            type: 'confirm',
+            message: `端口被占用了，切换到 ${_port}? (The port ${port} is not available, would you like to run on ${_port}?)`,
+            default: true
+          }
+        ]).then(answer => {
+          if (answer.changePort) {
+            compiler.options.devServer.port = answer.changePort;
+          } else {
+            process.exit(0);
+          }
+        });
+      }
+    })
+  }
 
+  apply(compiler: any) {
+    // check port;
+    this.initHandler(compiler)
     this.printHandler(compiler)
   }
 }
