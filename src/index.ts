@@ -14,17 +14,17 @@ interface Itip {
 interface Ioptions {
   // 是否显示 ip 信息
   ip: boolean;
-  
+
   // 文案提示信息
   tips: Array<Itip>;
 
   // 是否自动检测port 被占用并手动切换
-  checkPort?: boolean;
+  // checkPort?: boolean;
 
   // quiet为true 除了初始启动信息外，什么都不会写入控制台。
   // 这也意味着来自webpack的错误或警告是不可见的。
   // 默认false
-  quiet?: boolean;
+  // quiet?: boolean;
 }
 
 class WebpackPromptPlugin {
@@ -103,21 +103,7 @@ class WebpackPromptPlugin {
   initHandler(compiler: any): void {
     const self = this
     if (compiler.hooks) {
-      compiler.hooks.run.tapAsync(PLUGIN_NAME, (c) => {
-        console.info('runrun');
-        // setTimeout(()=>{
-        //   // console.log('文件列表', Object.keys(compilation.assets).join(','));
-
-        //   callback();
-        // }, 1000);
-        c.options.devServer.port = 1997;
-        setTimeout(() => {
-          c.options.devServer.port = 1996;
-        })
-      });
-
       compiler.hooks.watchRun.tap(PLUGIN_NAME, function(c) {
-        console.info('watchRun');
         self.isWatch = true
       })
       compiler.hooks.failed.tap(PLUGIN_NAME, function() {
@@ -150,8 +136,8 @@ class WebpackPromptPlugin {
       compiler.options.devServer.quiet = true;
     }
 
-    this.initHandler(compiler)
-    this.printHandler(compiler)
+    this.initHandler(compiler);
+    this.printHandler(compiler);
   }
 }
 

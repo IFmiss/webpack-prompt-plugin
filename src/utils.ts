@@ -14,7 +14,7 @@ export function checkPortTips (port: string | number, compiler: any): Promise<an
         console.error('err: ', err);
         reject(err);
       }
-  
+
       // 冲突
       if (port != _port) {
         console.info(`\n`);
