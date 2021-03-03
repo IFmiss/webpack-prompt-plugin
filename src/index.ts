@@ -1,8 +1,7 @@
 import {
+  checkPortTips,
   getPkg
 } from './utils';
-const detect = require('detect-port');
-const inquirer = require('inquirer');
 const chalk = require('chalk')
 const PLUGIN_NAME = 'webpack-prompt-plugin'
 const ip = require('ip');
@@ -13,9 +12,19 @@ interface Itip {
 }
 
 interface Ioptions {
+  // 是否显示 ip 信息
   ip: boolean;
+  
+  // 文案提示信息
   tips: Array<Itip>;
+
+  // 是否自动检测port 被占用并手动切换
   checkPort?: boolean;
+
+  // quiet为true 除了初始启动信息外，什么都不会写入控制台。
+  // 这也意味着来自webpack的错误或警告是不可见的。
+  // 默认false
+  quiet?: boolean;
 }
 
 class WebpackPromptPlugin {
@@ -24,10 +33,11 @@ class WebpackPromptPlugin {
   option = {
     ip: true,
     tips: [],
-    checkPort: true
+    checkPort: true,
+    quiet: false,
   }
   constructor (options: Ioptions) {
-    this.option = Object.assign({}, this.option, options)
+    this.option = Object.assign({}, this.option, options);
   }
 
   getIP(): string {
@@ -38,7 +48,7 @@ class WebpackPromptPlugin {
     // 打印返回信息
     if (this.option.ip) {
       const host = devServer.host ? (devServer.host === '0.0.0.0' ? this.getIP() : devServer.host) : 'localhost'
-      const port = devServer.port || 80
+      const port = devServer.port || 8080;
       const text = `http://${host}:${port}/`
       console.log('\n')
       console.log(chalk.bgGreen.black(' done '), chalk.green(`App is runing!`))
@@ -57,7 +67,8 @@ class WebpackPromptPlugin {
   printHandler(compiler: any): void {
     const self = this
     if (compiler.hooks) {
-      compiler.hooks.done.tap(PLUGIN_NAME, function() {
+      compiler.hooks.done.tap(PLUGIN_NAME, function(stats) {
+        console.info('stats', stats.compilation.options.devServer);
         if (self.isStarted) return
         self.isStarted = true
         self.option.ip && self.isWatch && compiler['options']['devServer'] && self.printIP(compiler['options']['devServer'])
@@ -86,14 +97,27 @@ class WebpackPromptPlugin {
     })
   }
 
+  /**
+   * 初始化 event 事件
+   */
   initHandler(compiler: any): void {
     const self = this
     if (compiler.hooks) {
-      compiler.hooks.afterPlugins.tap(PLUGIN_NAME, function(compiler) {
-        self.checkPort(compiler);
-        return;
+      compiler.hooks.run.tapAsync(PLUGIN_NAME, (c) => {
+        console.info('runrun');
+        // setTimeout(()=>{
+        //   // console.log('文件列表', Object.keys(compilation.assets).join(','));
+
+        //   callback();
+        // }, 1000);
+        c.options.devServer.port = 1997;
+        setTimeout(() => {
+          c.options.devServer.port = 1996;
+        })
       });
-      compiler.hooks.watchRun.tap(PLUGIN_NAME, function() {
+
+      compiler.hooks.watchRun.tap(PLUGIN_NAME, function(c) {
+        console.info('watchRun');
         self.isWatch = true
       })
       compiler.hooks.failed.tap(PLUGIN_NAME, function() {
@@ -101,7 +125,7 @@ class WebpackPromptPlugin {
         console.log(chalk.red('failed'))
       })
     } else {
-      compiler.plugin('watchRun', function(compiler: any) {
+      compiler.plugin('watchRun', function(c) {
         self.isWatch = true
       })
       compiler.plugin('failed', function () {
@@ -111,37 +135,21 @@ class WebpackPromptPlugin {
     }
   }
 
-  checkPort(compiler) {
+  /**
+   * 校验端口号
+   */
+  async checkPort(compiler) {
     if (!this.option.checkPort) return;
-    // compiler.options.devServer.port = 2000;
-    const port = compiler.options.devServer.port || 80;
-    detect(port, (err, _port) => {
-      if (err) {
-        console.log(err);
-      }
-      if (port === _port) {
-        console.log(`port: ${port} was not occupied`);
-      } else {
-        inquirer.prompt([
-          {
-            name: 'changePort',
-            type: 'confirm',
-            message: `端口被占用了，切换到 ${_port}? (The port ${port} is not available, would you like to run on ${_port}?)`,
-            default: true
-          }
-        ]).then(answer => {
-          if (answer.changePort) {
-            compiler.options.devServer.port = answer.changePort;
-          } else {
-            process.exit(0);
-          }
-        });
-      }
-    })
+    const port = compiler.options.devServer.port || 8080;
+    await checkPortTips(port, compiler);
+    return compiler;
   }
 
   apply(compiler: any) {
-    // check port;
+    if (this.option.quiet) {
+      compiler.options.devServer.quiet = true;
+    }
+
     this.initHandler(compiler)
     this.printHandler(compiler)
   }
