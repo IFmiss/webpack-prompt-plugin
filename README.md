@@ -1,6 +1,6 @@
 # webpack-prompt-plugin
 
-webpack提示插件
+webpack-dev-server 提示插件
 安装
 ```code
 yarn add webpack-prompt-plugin --dev
