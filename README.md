@@ -26,15 +26,14 @@ module.exports = {
   // ...
   plugins: [
     new WebpackPromptPlugin({
-			ip: true,
-			tips: [
-				{
-					name: 'hello webpack',
-					color: 'red'
-				},
-				'hello webpack'
-			]
-		})
+      ip: true,
+      tips: [{
+        name: 'hello webpack',
+        color: 'red'
+      },
+      'hello webpack'
+     ],
+     })
   ],
 }
 ```
@@ -44,5 +43,3 @@ module.exports = {
 是否run dev 打印ip  boolean
 #### tips
 提示信息队列 数组对象 或者 字符串数组都可以
-
-**is done**
