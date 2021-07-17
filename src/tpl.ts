@@ -16,7 +16,7 @@ type TemplateMapFn = {
 
 export const logStartTime = (
   time: number,
-  desc = 'Project start time:'
+  desc = 'Project compiled time:'
 ): Array<string> => {
   return [desc, ...time2M(time)];
 };
@@ -57,7 +57,7 @@ export default {
     const text = `http://${host}:${port}/`;
     logQueue([
       '\n',
-      ['Time ⏱:', ...time2M(time)],
+      ['Compiled Time ⏱:', ...time2M(time)],
       ['- Name: ', chalk.underline.green(name)],
       ['- Version: ', chalk.underline.green(version)],
       [`Project is running at `, chalk.blue(`http://localhost:${port}/`)],

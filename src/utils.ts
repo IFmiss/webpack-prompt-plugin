@@ -28,7 +28,7 @@ function time2Emoji(time: number): string {
   if (t > 2) {
     return '🚀';
   }
-  return '⚡️';
+  return '🛸 ⚡️⚡️⚡️';
 }
 
 export function time2M(t: number): [string, string] {

@@ -45,7 +45,7 @@ let t: number;
 
 export = class WebpackPromptPlugin {
   isWatch = false;
-  isStarted = false;
+  // isStarted = false;
   option = DEFAULT_OPTIONS;
   constructor(options: IOptions) {
     this.option = Object.assign({}, this.option, options);
@@ -75,12 +75,11 @@ export = class WebpackPromptPlugin {
 
   printHandler(compiler: any): void {
     const self = this;
-    const { isStarted } = this;
 
     compiler.hooks.done.tap(PLUGIN_NAME, function () {
       setTimeout(() => {
-        if (isStarted) return;
-        self.isStarted = true;
+        // if (self.isStarted) return;
+        // self.isStarted = true;
 
         if (self.isWatch) {
           self.printIP(compiler?.options?.devServer || {});
@@ -107,6 +106,7 @@ export = class WebpackPromptPlugin {
   initHandler(compiler: any): void {
     const self = this;
     compiler.hooks.watchRun.tap(PLUGIN_NAME, function (c) {
+      t = performance.now();
       self.isWatch = true;
     });
     compiler.hooks.failed.tap(PLUGIN_NAME, function () {
@@ -116,7 +116,6 @@ export = class WebpackPromptPlugin {
   }
 
   apply(compiler: any) {
-    t = performance.now();
     this.initHandler(compiler);
     this.printHandler(compiler);
   }
