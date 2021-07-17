@@ -47,11 +47,17 @@ module.exports = {
 ### Instance attributes
 ### style `'default' | 'text' | 'table'`
 - `default`
+
   ![default style](./img/default.jpg)
+
 - `text`
+ 
   ![text style](./img/text.jpg)
+
 - `table`
+
   ![table style](./img/table.jpg)
+ 
 
 default style is `default` 😂
 
