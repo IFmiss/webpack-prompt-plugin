@@ -1,14 +1,17 @@
 # webpack-prompt-plugin
 
-webpack-dev-server 提示插件
-安装
+Used to prompt ip link and some other information when webpack-dev-server Successfully started
+
+### usage
+
+install
 ```code
 yarn add webpack-prompt-plugin --dev
 ```
 
 或者
 ```code
-npm install webpack-prompt-plugin --save-dev
+pnpm install webpack-prompt-plugin -D
 ```
 
 ```js
@@ -20,26 +23,49 @@ module.exports = {
     new webpackPromptPlugin()
   ],
 }
+```
 
+```js
 // 带参数
 module.exports = {
   // ...
   plugins: [
     new WebpackPromptPlugin({
-      ip: true,
-      tips: [{
-        name: 'hello webpack',
-        color: 'red'
-      },
-      'hello webpack'
-     ],
-     })
+      tips: [
+        {
+          name: '[🏀] web project',
+          color: 'green'
+        },
+        'this is react spa project'
+      ],
+      time: true
+    })
   ],
 }
 ```
 
-### 参数
-#### ip
-是否run dev 打印ip  boolean
-#### tips
-提示信息队列 数组对象 或者 字符串数组都可以
+### Instance attributes
+### style `'default' | 'text' | 'table'`
+- `default`
+  ![default style](./img/default.jpg)
+- `text`
+  ![text style](./img/text.jpg)
+- `table`
+  ![table style](./img/table.jpg)
+
+default style is `default` 😂
+
+#### tips: `Array<{ text: string, color?: string } | string>`
+Prompt message queue, array object or string array can be
+```code
+{
+  tips: [
+    {
+      name: '[🏀] web project',
+      color: 'green'
+    },
+    'this is react spa project'
+  ],
+}
+```
+![tips text](./img/tips.jpg)

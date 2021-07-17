@@ -1,1 +1,82 @@
-"use strict";function o(o,t,n,e){return new(n||(n=Promise))((function(i,r){function s(o){try{l(e.next(o))}catch(o){r(o)}}function c(o){try{l(e.throw(o))}catch(o){r(o)}}function l(o){var t;o.done?i(o.value):(t=o.value,t instanceof n?t:new n((function(o){o(t)}))).then(s,c)}l((e=e.apply(o,t||[])).next())}))}function t(o,t){var n,e,i,r,s={label:0,sent:function(){if(1&i[0])throw i[1];return i[1]},trys:[],ops:[]};return r={next:c(0),throw:c(1),return:c(2)},"function"==typeof Symbol&&(r[Symbol.iterator]=function(){return this}),r;function c(r){return function(c){return function(r){if(n)throw new TypeError("Generator is already executing.");for(;s;)try{if(n=1,e&&(i=2&r[0]?e.return:r[0]?e.throw||((i=e.return)&&i.call(e),0):e.next)&&!(i=i.call(e,r[1])).done)return i;switch(e=0,i&&(r=[2&r[0],i.value]),r[0]){case 0:case 1:i=r;break;case 4:return s.label++,{value:r[1],done:!1};case 5:s.label++,e=r[1],r=[0];continue;case 7:r=s.ops.pop(),s.trys.pop();continue;default:if(!(i=s.trys,(i=i.length>0&&i[i.length-1])||6!==r[0]&&2!==r[0])){s=0;continue}if(3===r[0]&&(!i||r[1]>i[0]&&r[1]<i[3])){s.label=r[1];break}if(6===r[0]&&s.label<i[1]){s.label=i[1],i=r;break}if(i&&s.label<i[2]){s.label=i[2],s.ops.push(r);break}i[2]&&s.ops.pop(),s.trys.pop();continue}r=t.call(o,s)}catch(o){r=[6,o],e=0}finally{n=i=0}if(5&r[0])throw r[1];return{value:r[0]?r[1]:void 0,done:!0}}([r,c])}}}var n=require("fs"),e=require("chalk"),i=require("detect-port");function r(o,t){return new Promise((function(n,r){i(o,(function(i,s){i&&(console.error("err: ",i),r(i)),o!=s&&(console.info("\n"),console.info("\n"),console.info(e.yellow("[提示]: "+o+" 端口被占用了，为您切换至 "+s+" ("+o+" port is occupied, switch to "+s+" for you)")),console.info("\n"),t.options.devServer.port=s),n(s)}))}))}var s,c=require("chalk"),l="webpack-prompt-plugin",p=require("ip"),u=(s=n.readFileSync("package.json"),JSON.parse(s)),a=function(){function n(o){this.isWatch=!1,this.isStarted=!1,this.option={ip:!0,tips:[],checkPort:!0,quiet:!1},this.option=Object.assign({},this.option,o)}return n.prototype.getIP=function(){return p.address()},n.prototype.printIP=function(o){if(this.option.ip){var t=o.host?"0.0.0.0"===o.host?this.getIP():o.host:"localhost",n=o.port||8080,e="http://"+t+":"+n+"/";console.log("\n"),console.log(c.bgGreen.black(" done "),c.green("App is runing!")),console.log("\n"),console.log("- Local:  ",c.underline.blue("http://localhost:"+n+"/")),console.log("- Network:",c.underline.blue(e)),console.log("\n")}},n.prototype.printProjectInfo=function(){console.log("name: ",c.underline.green(u.name),"   version: ",c.underline.green(u.version)),console.log("\n")},n.prototype.printHandler=function(o){var t=this;o.hooks?o.hooks.done.tap(l,(function(n){console.info("stats",n.compilation.options.devServer),t.isStarted||(t.isStarted=!0,t.option.ip&&t.isWatch&&o.options.devServer&&t.printIP(o.options.devServer),t.printProjectInfo(),t.printCustom())})):o.plugin("done",(function(n){t.isStarted||(t.isStarted=!0,t.option.ip&&t.isWatch&&o.options.devServer&&t.printIP(o.options.devServer),t.printProjectInfo(),t.printCustom())}))},n.prototype.printCustom=function(){this.option.tips&&this.option.tips.length&&this.option.tips.forEach((function(o){var t=o.color?o.color:"green";"object"==typeof o?console.log(c[t](o.name||"hello "+l)):console.log(c.green(o||"hello "+l))}))},n.prototype.initHandler=function(o){var t=this;o.hooks?(o.hooks.watchRun.tap(l,(function(o){console.info("watchRun"),t.isWatch=!0})),o.hooks.failed.tap(l,(function(){t.isWatch=!1,console.log(c.red("failed"))}))):(o.plugin("watchRun",(function(o){t.isWatch=!0})),o.plugin("failed",(function(){t.isWatch=!1,console.log(c.red("failed"))})))},n.prototype.checkPort=function(n){return o(this,void 0,void 0,(function(){return t(this,(function(o){switch(o.label){case 0:return this.option.checkPort?[4,r(n.options.devServer.port||8080,n)]:[2];case 1:return o.sent(),[2,n]}}))}))},n.prototype.apply=function(o){this.option.quiet&&(o.options.devServer.quiet=!0),o.options.devServer.port=1997,setTimeout((function(){o.options.devServer.port=1996})),this.initHandler(o),this.printHandler(o)},n}();module.exports=a;
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+const tpl_1 = __importDefault(require("./tpl"));
+const chalk_1 = __importDefault(require("chalk"));
+const ip_1 = __importDefault(require("ip"));
+const perf_hooks_1 = require("perf_hooks");
+const PLUGIN_NAME = 'webpack-prompt-plugin';
+const DEFAULT_OPTIONS = {
+    tips: [],
+    style: 'default'
+};
+let t;
+module.exports = class WebpackPromptPlugin {
+    constructor(options) {
+        this.isWatch = false;
+        this.isStarted = false;
+        this.option = DEFAULT_OPTIONS;
+        this.option = Object.assign({}, this.option, options);
+    }
+    getIP() {
+        return ip_1.default.address();
+    }
+    printIP(devServer) {
+        const { option: { style } } = this;
+        // 打印返回信息
+        const host = devServer.host
+            ? devServer.host === '0.0.0.0'
+                ? this.getIP()
+                : devServer.host
+            : 'localhost';
+        const port = devServer.port || 8080;
+        tpl_1.default[style]({
+            host,
+            port,
+            time: t
+        });
+    }
+    printHandler(compiler) {
+        const self = this;
+        const { isStarted } = this;
+        compiler.hooks.done.tap(PLUGIN_NAME, function () {
+            setTimeout(() => {
+                var _a;
+                if (isStarted)
+                    return;
+                self.isStarted = true;
+                if (self.isWatch) {
+                    self.printIP(((_a = compiler === null || compiler === void 0 ? void 0 : compiler.options) === null || _a === void 0 ? void 0 : _a.devServer) || {});
+                    self.printCustom();
+                }
+            });
+        });
+    }
+    printCustom() {
+        const { option: { tips } } = this;
+        tips === null || tips === void 0 ? void 0 : tips.forEach((item) => {
+            var _a, _b;
+            const color = typeof item !== 'string' && item.color ? item.color : 'white';
+            console.log(chalk_1.default[color]((_b = (_a = item) === null || _a === void 0 ? void 0 : _a.text) !== null && _b !== void 0 ? _b : (item || '')));
+        });
+    }
+    /**
+     * 初始化 event 事件
+     */
+    initHandler(compiler) {
+        const self = this;
+        compiler.hooks.watchRun.tap(PLUGIN_NAME, function (c) {
+            self.isWatch = true;
+        });
+        compiler.hooks.failed.tap(PLUGIN_NAME, function () {
+            self.isWatch = false;
+            console.log(chalk_1.default.red('failed'));
+        });
+    }
+    apply(compiler) {
+        t = perf_hooks_1.performance.now();
+        this.initHandler(compiler);
+        this.printHandler(compiler);
+    }
+};

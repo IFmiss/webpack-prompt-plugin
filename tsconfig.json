@@ -1,26 +1,26 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "ESNext",
+    "target": "es6",
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "removeComments": false,
     "declaration": true,
     "outDir": "./dist",
     "declarationDir": "./dist",
     "baseUrl": "./",
-    "rootDir": "src",
+    "esModuleInterop": true,
     "experimentalDecorators": true,
-    "allowJs": false,
+    "allowJs": true,
     "lib": [
       "dom",
       "es2015"
     ],
-    "sourceMap": true,
+    "sourceMap": false,
     "noImplicitAny": false
   },
-  "files": [
-    "src/index.ts"
-  ],
+  "include": ["src/**/*"],
   "exclude": [
+    "dist",
     "node_modules"
   ]
 }

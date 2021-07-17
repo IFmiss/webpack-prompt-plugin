@@ -1,29 +1,39 @@
-const fs = require('fs');
-const chalk = require('chalk');
-const detect = require('detect-port');
+import fs from 'fs';
+import { performance } from 'perf_hooks';
 
-export function getPkg() {
-  const pkg = fs.readFileSync('package.json');
+export function getPkg(): {
+  [props: string]: unknown;
+} {
+  const pkg = fs.readFileSync('package.json').toString();
   return JSON.parse(pkg);
-};
+}
 
-export function checkPortTips (port: string | number, compiler: any): Promise<any> {
-  return new Promise((resolve, reject) => {
-    detect(port, (err, _port) => {
-      if (err) {
-        console.error('err: ', err);
-        reject(err);
-      }
+function time2Emoji(time: number): string {
+  const t = time / 1000;
+  if (t >= 20) {
+    return '🐌';
+  }
+  if (t > 15) {
+    return '🐢';
+  }
+  if (t > 10) {
+    return '🛵';
+  }
+  if (t > 6) {
+    return '🚂';
+  }
+  if (t > 4) {
+    return '🚅';
+  }
+  if (t > 2) {
+    return '🚀';
+  }
+  return '⚡️';
+}
 
-      // 冲突
-      if (port != _port) {
-        console.info(`\n`);
-        console.info(`\n`);
-        console.info(chalk.yellow(`[提示]: ${port} 端口被占用了，为您切换至 ${_port} (${port} port is occupied, switch to ${_port} for you)`));
-        console.info(`\n`);
-        compiler.options.devServer.port = _port;
-      }
-      resolve(_port);
-    });
-  })
-};
+export function time2M(t: number): [string, string] {
+  const time = performance.now() - t;
+  const str =
+    time > 2000 ? `${(time / 1000).toFixed(2)}s` : `${time.toFixed(0)}ms`;
+  return [str, time2Emoji(time)];
+}
