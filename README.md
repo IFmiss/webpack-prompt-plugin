@@ -38,7 +38,7 @@ module.exports = {
         },
         'this is react spa project'
       ],
-      time: true
+      style: 'table'
     })
   ],
 }
@@ -51,13 +51,13 @@ module.exports = {
   ![default style](./img/default.jpg)
 
 - `text`
- 
+
   ![text style](./img/text.jpg)
 
 - `table`
 
   ![table style](./img/table.jpg)
- 
+
 
 default style is `default` 😂
 
