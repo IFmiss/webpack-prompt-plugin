@@ -77,7 +77,8 @@ export = class WebpackPromptPlugin {
     tpl[style]({
       host,
       port,
-      time: t
+      time: t,
+      isFirst: this.isFirst
     });
   }
 

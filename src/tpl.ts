@@ -9,6 +9,7 @@ type TemplateFnParams = {
   port: number;
   host: string;
   time: number;
+  isFirst: boolean;
 };
 type TemplateMapFn = {
   [k in TemplateStyle]: (params: TemplateFnParams) => void;
@@ -32,7 +33,7 @@ export const logQueue = (queue: Array<string | Array<string>>): void => {
 };
 
 export default {
-  default: ({ port, host, time }) => {
+  default: ({ port, host, time, isFirst }) => {
     const text = `http://${host}:${port}`;
     logQueue([
       '\n',
@@ -41,7 +42,7 @@ export default {
       [
         '- Local:  ',
         chalk.underline.blue(`http://localhost:${port}`),
-        chalk.gray(' (Copied to clipboard)')
+        isFirst ? chalk.gray(' [copied to clipboard]') : ''
       ],
       ['- Network:', chalk.underline.blue(text)],
       '\n',
@@ -57,7 +58,7 @@ export default {
     ]);
   },
 
-  text: ({ port, host, time }) => {
+  text: ({ port, host, time, isFirst }) => {
     const text = `http://${host}:${port}`;
     logQueue([
       '\n',
@@ -67,16 +68,16 @@ export default {
       [
         `Project is running at `,
         chalk.blue(`http://localhost:${port}`),
-        chalk.gray(' (Copied to clipboard)')
+        isFirst ? chalk.gray(' [copied to clipboard]') : ''
       ],
       [`Visit on network at `, chalk.blue(text)],
       '\n'
     ]);
   },
 
-  table: ({ port, host, time }) => {
+  table: ({ port, host, time, isFirst }) => {
     const text = `http://${host}:${port} ${chalk.gray(
-      ' (Copied to clipboard)'
+      isFirst ? chalk.gray(' [copied to clipboard]') : ''
     )}`;
     console.log('\n');
     console.table([
