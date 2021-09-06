@@ -33,12 +33,16 @@ export const logQueue = (queue: Array<string | Array<string>>): void => {
 
 export default {
   default: ({ port, host, time }) => {
-    const text = `http://${host}:${port}/`;
+    const text = `http://${host}:${port}`;
     logQueue([
       '\n',
       [chalk.bgGreen.black(' done '), chalk.green(`App is runing!`)],
       '\n',
-      ['- Local:  ', chalk.underline.blue(`http://localhost:${port}/`)],
+      [
+        '- Local:  ',
+        chalk.underline.blue(`http://localhost:${port}`),
+        chalk.gray(' (Copied to clipboard)')
+      ],
       ['- Network:', chalk.underline.blue(text)],
       '\n',
       [
@@ -54,20 +58,26 @@ export default {
   },
 
   text: ({ port, host, time }) => {
-    const text = `http://${host}:${port}/`;
+    const text = `http://${host}:${port}`;
     logQueue([
       '\n',
       ['Compiled Time ⏱:', ...time2M(time)],
       ['- Name: ', chalk.underline.green(name)],
       ['- Version: ', chalk.underline.green(version)],
-      [`Project is running at `, chalk.blue(`http://localhost:${port}/`)],
+      [
+        `Project is running at `,
+        chalk.blue(`http://localhost:${port}`),
+        chalk.gray(' (Copied to clipboard)')
+      ],
       [`Visit on network at `, chalk.blue(text)],
       '\n'
     ]);
   },
 
   table: ({ port, host, time }) => {
-    const text = `http://${host}:${port}/`;
+    const text = `http://${host}:${port} ${chalk.gray(
+      ' (Copied to clipboard)'
+    )}`;
     console.log('\n');
     console.table([
       {

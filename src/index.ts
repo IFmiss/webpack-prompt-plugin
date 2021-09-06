@@ -2,6 +2,8 @@ import tpl, { TemplateStyle } from './tpl';
 import chalk from 'chalk';
 import ip from 'ip';
 import { performance } from 'perf_hooks';
+import clipboardy from 'clipboardy';
+
 const PLUGIN_NAME = 'webpack-prompt-plugin';
 
 interface ITip {
@@ -45,7 +47,7 @@ let t: number;
 
 export = class WebpackPromptPlugin {
   isWatch = false;
-  // isStarted = false;
+  isFirst = true;
   option = DEFAULT_OPTIONS;
   constructor(options: IOptions) {
     this.option = Object.assign({}, this.option, options);
@@ -66,6 +68,12 @@ export = class WebpackPromptPlugin {
         : devServer.host
       : 'localhost';
     const port = devServer.port || 8080;
+
+    if (this.isFirst) {
+      clipboardy.writeSync(`http://localhost:${port}`);
+    }
+
+    // console.log
     tpl[style]({
       host,
       port,
@@ -78,12 +86,10 @@ export = class WebpackPromptPlugin {
 
     compiler.hooks.done.tap(PLUGIN_NAME, function () {
       setTimeout(() => {
-        // if (self.isStarted) return;
-        // self.isStarted = true;
-
         if (self.isWatch) {
           self.printIP(compiler?.options?.devServer || {});
           self.printCustom();
+          self.isFirst = false;
         }
       });
     });

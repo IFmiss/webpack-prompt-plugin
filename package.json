@@ -1,6 +1,6 @@
 {
   "name": "webpack-prompt-plugin",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "Used to prompt ip link and some other information when webpack-dev-server Successfully started",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "chalk": "^4.1.0",
+    "clipboardy": "^2.3.0",
     "ip": "^1.1.5"
   }
 }
